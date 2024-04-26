@@ -12,3 +12,4 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(port);
 app.use("/", require("./routes/home"));
+app.use("/pyserver", require("./server/api"));
