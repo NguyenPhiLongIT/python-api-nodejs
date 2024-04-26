@@ -1,6 +1,7 @@
 // var request = require("request-promise");
 const express = require('express');
 const router = express.Router();
+const request = require('request');
 
 // const arraysum = async (req, res, next) => {
 //   // This variable contains the data
@@ -39,17 +40,25 @@ const router = express.Router();
 //   return sendrequest;
 // };
 
-const axios = require('axios');
-const { response } = require('express');
-const url = "http://127.0.0.1:5000/pyserver";
-axios.get(url, {
-  headers : {
-    'Content-Type' : 'application/json',
-  }
-}).then(response => {
-  console.log(response.data);
-}).catch(error => {
-  console.log("error: " + error);
+// const axios = require('axios');
+// const { response } = require('express');
+// const url = "http://127.0.0.1:5000/pyserver";
+// axios.get(url, {
+//   headers : {
+//     'Content-Type' : 'application/json',
+//   }
+// }).then(response => {
+//   console.log(response.data);
+// }).catch(error => {
+//   console.log("error: " + error);
+// });
+
+router.get('/', function(req, res, next) {
+  var url = "http://127.0.0.1:5000/pyserver";
+  request(url, function(error, response, body) {
+    console.log(body);
+  });
+  res.render('test');
 });
 
 module.exports = router;
