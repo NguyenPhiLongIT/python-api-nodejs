@@ -26,4 +26,4 @@ def get_gallery():
     im_names.append(jpeg1.tobytes())
     return render_template("gallery.html", image_names=im_names)
 if __name__ == "__main__": 
-	app.run(port=5000, debug=True)
+	app.run(host= '0.0.0.0', port=5000, debug=True)
