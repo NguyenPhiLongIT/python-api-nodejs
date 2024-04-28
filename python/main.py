@@ -1,5 +1,8 @@
-import cv2 as cv
+# import flask
+# from flask import Flask, request, render_template, jsonify
+# from flask_cors import CORS
 
-img = cv.imread("../public/image/CoinsA.png")
-cv.imshow("Coin", img)
-k = cv.waitKey(0)
+# import cv2
+
+# im = cv2.imread('image/CoinsA.png')
+# render_template("index.ejs", imageSrc="image/CoinsA.png")

@@ -1,0 +1,7 @@
+flask
+subprocess
+json
+request 
+render_template
+flask_cors
+opencv-python
