@@ -4,7 +4,6 @@ const request = require('request-promise');
 const axios = require('axios');
 
 
-
 router.get('/<image_path>', async (req, res) => {
   const { image_path } = req.params;  // Trích xuất đúng path từ tham số
   console.log('Received data - path: ', image_path);
