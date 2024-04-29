@@ -5,40 +5,22 @@ const axios = require('axios');
 
 
 
-router.get('/', async (req, res) => {
+router.get('/<image_path>', async (req, res) => {
+  const { image_path } = req.params;  // Trích xuất đúng path từ tham số
+  console.log('Received data - path: ', image_path);
+  
+  
   try {
-    const response = await axios.get('http://127.0.0.1:5000/pyserver');
+    const response = await axios.get(`http://127.0.0.1:5000/pyserver/${image_path}`);
+    const imagePath = response.data.imagePath;
 
-    // res.json(response.data);
-    res.send(response.data);
+    // Render template và truyền imagePath
+    res.render('index', { imagePath: imagePath });
+  } catch (error) {
+    console.log('Error: ', error.message);
+    res.render('error', { error: 'Server error or API fetch failed' });
   }
-  catch(error) {
-    console.error('Error: ', error.message);
-    res.status(500).json({error: 'Server error'});
-  }
-  // var options = {
-  //   method: "POST",
-  //   uri: "http://127.0.0.1:5000/pyserver",
-
-  //   // Automatically stringifies
-  //   // the body to JSON
-  //   json: true,
-  // };
-
-  // var sendrequest = await request(options)
-  //   // The parsedBody contains the data
-  //   // sent back from the Flask server
-  //   .then(function (parsedBody) {
-  //     console.log(parsedBody);
-
-  //     // You can do something with
-  //     // returned data
-  //     res.json(parsedBody);
-  //   })
-  //   .catch(function (err) {
-  //     console.log(err);
-  //   });
-  // return sendrequest;
 });
+
 
 module.exports = router;
