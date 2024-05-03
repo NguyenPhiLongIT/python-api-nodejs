@@ -75,7 +75,7 @@
                     </div>
                     <h5 class="status card-title">Status: OK</h5>
                     <h5 class="card-title">Image Detected</h5>
-                    <!-- <img class="img-detected" src="./image/CoinsA.png" height="345" alt="..."> -->
+                    <img src="<%= typeof result != 'undefined' ? result : '' %>" class="responsive-img">
                 </div>
             </div>
         </div>
@@ -86,5 +86,10 @@
                 <button type="submit" name="upload" class="btn btn-primary pull-right">Upload</button>
             </form>
         </div>
+        <!-- <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*">
+            <button type="submit">Upload</button>
+        </form> -->
     </div>
 </body>
+</html>

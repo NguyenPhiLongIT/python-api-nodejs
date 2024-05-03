@@ -3,32 +3,10 @@ const path = require('path');
 const request = require('request-promise');
 const router = express.Router();
 const multer = require('multer');
+const fs = require('fs').promises;
 
-router.get("/", async (req, res) => {
-  var data = { // this variable contains the data you want to send 
-    data1: "foo",
-    data2: "bar"
-  }
-
-  var options = {
-    method: 'POST',
-    uri: 'http://127.0.0.1:5000/postdata',
-    body: data,
-    json: true // Automatically stringifies the body to JSON 
-  };
-
-  var returndata;
-  var sendrequest = await request(options)
-    .then(function (parsedBody) {
-      console.log(parsedBody); // parsedBody contains the data sent back from the Flask server 
-      returndata = parsedBody; // do something with this data, here I'm assigning it to a variable. 
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
-
-  // res.send(returndata);
-  res.render('home', { title: 'Algorit Vision' })
+router.get('/', (req, res) => {
+  res.render('home');
 });
 
 // Set The Storage Engine
@@ -64,25 +42,59 @@ function checkFileType(file, cb) {
   }
 }
 
-router.post('/upload', (req, res) => {
-  upload(req, res, (err) => {
+router.post('/upload', async (req, res) => {
+  
+  const loadFile = upload(req, res, (err) => {
     if (err) {
       res.render('home', {
         msg: err
       });
+      return;
+    }
+    if (req.file == undefined) {
+      res.render('home', {
+        msg: 'Error: No File Selected!'
+      });
     } else {
-      if (req.file == undefined) {
-        res.render('home', {
-          msg: 'Error: No File Selected!'
-        });
-      } else {
-        res.render('home', {
-          msg: 'File Uploaded!',
-          file: `uploads/${req.file.filename}`
-        });
-      }
+      // res.send({"upload":returndata});
+
     }
   });
+  const myTimeout = setTimeout(loadFile, 2000);
+
+  var data = { // this variable contains the data you want to send 
+    data1: {
+      "filename": `${req?.file?.filename}`, 
+      "code": (await convertImageToBase64(`${req?.file?.filename}`)).toString()
+    }
+  }
+
+  var options = {
+    method: 'POST',
+    uri: 'http://127.0.0.1:5000/postdata',
+    body: data,
+    json: true // Automatically stringifies the body to JSON 
+  };
+
+  await request(options)
+    .then(function (parsedBody) {
+      returndata = parsedBody["ls"]; // do something with this data, here I'm assigning it to a variable. 
+    })
+    .catch(function (err) {
+      console.log(err);
+    });
+    console.log(`FILE NAME ${req.file.filename}`);
+  res.render('home', {
+    msg: 'File Uploaded!',
+    file: `uploads/${req.file.filename}`,
+    result: `uploads/result/myImage-1714386924454.jpg`
+  });
 });
+
+async function convertImageToBase64(filename) {
+  const data = await fs.readFile(`./public/uploads/${filename}`);
+  const base64Image = Buffer.from(data, 'binary').toString('base64');
+  return base64Image;
+}
 
 module.exports = router;
