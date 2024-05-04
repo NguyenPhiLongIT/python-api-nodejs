@@ -43,7 +43,8 @@
                     <div class="row g-0">
                         <div class="col-md-8">
                             <div class="card">
-                                <img src="<%= typeof file != 'undefined' ? file : '' %>" class="responsive-img">
+                                <img src="<%= typeof file != 'undefined' ? file : '' %>" class="responsive-img"
+                                    style="max-height: 38rem;">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -75,7 +76,8 @@
                     </div>
                     <h5 class="status card-title">Status: OK</h5>
                     <h5 class="card-title">Image Detected</h5>
-                    <img src="<%= typeof result != 'undefined' ? result : '' %>" class="responsive-img">
+                    <img src="<%= typeof result != 'undefined' ? result : '' %>" class="responsive-img" 
+                        style="max-height: 20rem;">
                 </div>
             </div>
         </div>
@@ -86,10 +88,6 @@
                 <button type="submit" name="upload" class="btn btn-primary pull-right">Upload</button>
             </form>
         </div>
-        <!-- <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="image" accept="image/*">
-            <button type="submit">Upload</button>
-        </form> -->
     </div>
 </body>
 </html>

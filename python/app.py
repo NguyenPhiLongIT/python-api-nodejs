@@ -35,9 +35,14 @@ def postdata():
 
 def process_image(imgdata):
     np_arr = np.frombuffer(imgdata, np.uint8)   # Convert base64-encoded image data to numpy array
-    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
-    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    return gray_img
+    img = cv.imdecode(np_arr, cv.IMREAD_GRAYSCALE)
+    _, binary_img = cv.threshold(img, 123, 250, cv.THRESH_BINARY_INV)
+
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (7,7))
+    img_dilate = cv.dilate(binary_img, kernel, anchor=(-1, -1), iterations=2)
+    # img_erode = cv.erode(img_dilate, kernel)
+
+    return img_dilate
 
 def decode_base64(filename, code):
     imgdata = base64.b64decode(code)

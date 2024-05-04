@@ -12,8 +12,10 @@ router.get('/', (req, res) => {
 // Set The Storage Engine
 const storage = multer.diskStorage({
   destination: './public/uploads/',
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  filename:  (req, file, cb) => {
+    console.log(file)
+    const dateTime = new Date().toISOString().replace(/:/g, '-');
+    cb(null, `${dateTime}_${file.originalname}`);
   }
 });
 
@@ -85,7 +87,6 @@ router.post('/upload', async (req, res) => {
         .catch(function (err) {
           console.log(err);
         });
-      console.log(`FILE NAME ${req.file.filename}`);
 
       res.render('home', {
         msg: 'File Uploaded!',

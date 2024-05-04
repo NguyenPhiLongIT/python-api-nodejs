@@ -44,4 +44,4 @@ new_frame_time = time.time()
 # curr_time = time.localtime()
 # curr_clock = time.strftime("%c", curr_time)
 # #print(curr_clock)
-# cv2.destroyAllWindows()
+# cv2.destroyAllWindows()zz
