@@ -1,2 +1,5 @@
 .vscode/
+.venv/
+images/
 node_modules/
+datasets/

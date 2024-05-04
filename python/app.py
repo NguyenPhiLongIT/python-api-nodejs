@@ -7,6 +7,7 @@ from flask_cors import CORS
 import base64
 import cv2 as cv
 import numpy as np
+from ultralytics import YOLO
 
 app = Flask(__name__)
 CORS(app)
@@ -44,11 +45,24 @@ def process_image(imgdata):
 
     return img_dilate
 
+def train(imgdata):
+    np_arr = np.frombuffer(imgdata, np.uint8)   # Convert base64-encoded image data to numpy array
+    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
+    model = YOLO('yolov8n.pt')
+    results = model(img, save=True)  # working
+    print(results)
+    cv.waitKey(1)
+    res_plotted = results[0].plot()
+    return res_plotted
+
 def decode_base64(filename, code):
     imgdata = base64.b64decode(code)
     filename = '../public/uploads/result/' + filename
+    # with open(filename, 'wb') as f:
+    #     result = process_image(imgdata)
+    #     cv.imwrite(filename, result)
     with open(filename, 'wb') as f:
-        result = process_image(imgdata)
+        result = train(imgdata)
         cv.imwrite(filename, result)
 
 if __name__ == "__main__":
