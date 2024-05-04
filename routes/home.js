@@ -43,8 +43,7 @@ function checkFileType(file, cb) {
 }
 
 router.post('/upload', async (req, res) => {
-  
-  const loadFile = upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       res.render('home', {
         msg: err
@@ -59,36 +58,69 @@ router.post('/upload', async (req, res) => {
       // res.send({"upload":returndata});
 
     }
-  });
-  const myTimeout = setTimeout(loadFile, 2000);
 
-  var data = { // this variable contains the data you want to send 
-    data1: {
-      "filename": `${req?.file?.filename}`, 
-      "code": (await convertImageToBase64(`${req?.file?.filename}`)).toString()
+    try {
+      const base64Image = await convertImageToBase64(req.file.filename);
+
+      const data = {
+        data1: {
+          filename: req.file.filename,
+          code: base64Image
+        }
+      };
+
+      const options = {
+        method: 'POST',
+        uri: 'http://127.0.0.1:5000/postdata',
+        body: data,
+        json: true // Automatically stringifies the body to JSON 
+      };
+
+      // const parsedBody = await request(options);
+      // const returndata = parsedBody.ls;
+      await request(options)
+        .then(function (parsedBody) {
+          returndata = parsedBody["ls"]; // do something with this data, here I'm assigning it to a variable. 
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+      console.log(`FILE NAME ${req.file.filename}`);
+
+      res.render('home', {
+        msg: 'File Uploaded!',
+        file: `uploads/${req.file.filename}`,
+        result: `uploads/result/${req.file.filename}`
+      });
+    } catch (error) {
+      console.error('Error processing file:', error);
+      res.render('home', { msg: 'Error processing file.' });
     }
-  }
-
-  var options = {
-    method: 'POST',
-    uri: 'http://127.0.0.1:5000/postdata',
-    body: data,
-    json: true // Automatically stringifies the body to JSON 
-  };
-
-  await request(options)
-    .then(function (parsedBody) {
-      returndata = parsedBody["ls"]; // do something with this data, here I'm assigning it to a variable. 
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
-    console.log(`FILE NAME ${req.file.filename}`);
-  res.render('home', {
-    msg: 'File Uploaded!',
-    file: `uploads/${req.file.filename}`,
-    result: `uploads/result/myImage-1714386924454.jpg`
   });
+
+  // var data = { // this variable contains the data you want to send 
+  //   data1: {
+  //     "filename": `${req?.file?.filename}`, 
+  //     "code": (await convertImageToBase64(`${req?.file?.filename}`)).toString()
+  //   }
+  // }
+
+  // var options = {
+  //   method: 'POST',
+  //   uri: 'http://127.0.0.1:5000/postdata',
+  //   body: data,
+  //   json: true // Automatically stringifies the body to JSON 
+  // };
+
+
+  // await request(options)
+  //   .then(function (parsedBody) {
+  //     returndata = parsedBody["ls"]; // do something with this data, here I'm assigning it to a variable. 
+  //   })
+  //   .catch(function (err) {
+  //     console.log(err);
+  //   });
+
 });
 
 async function convertImageToBase64(filename) {

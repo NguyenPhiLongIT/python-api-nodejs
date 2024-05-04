@@ -6,6 +6,7 @@ from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
 import base64
 import cv2 as cv
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -32,22 +33,9 @@ def postdata():
     decode_base64(filename, code)
     return json.dumps({"result":ls}) 
 
-@app.route('/upload', methods=['POST'])
-# def upload_image():
-#     try:
-#         # Process the image (e.g., convert to grayscale)
-#         processed_image_data = process_image()
-#         # Save the processed image to a temporary file
-#         filename = 'processed_image.jpg'
-#         cv.imwrite(filename, processed_image_data)
-#         # Return the processed image file to the client
-#         return send_file(filename, mimetype='image/jpeg')
-#     except Exception as e:
-#         print('Error:', str(e))
-#         return 'Internal server error', 500
-
-def process_image(source):
-    img = cv.imread(source)
+def process_image(imgdata):
+    np_arr = np.frombuffer(imgdata, np.uint8)   # Convert base64-encoded image data to numpy array
+    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     return gray_img
 
@@ -55,7 +43,8 @@ def decode_base64(filename, code):
     imgdata = base64.b64decode(code)
     filename = '../public/uploads/result/' + filename
     with open(filename, 'wb') as f:
-        f.write(code)
+        result = process_image(imgdata)
+        cv.imwrite(filename, result)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
