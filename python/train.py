@@ -104,6 +104,13 @@ COLOR = (0, 255, 0)
 def detect_number_plates(image, model, display=False):
     start = time.time()
     detections = model.predict(image)[0].boxes.data
+
+    # detect = model.predict(image)[0].classes.data
+    json = model.predict(image)[0].masks
+
+    print(detections)
+    print("-----------")
+    print(json)
     if detections.shape != torch.Size([0, 6]):
         boxes = []
         confidences = []
