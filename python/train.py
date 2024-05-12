@@ -106,20 +106,25 @@ def detect_number_plates(image, model, display=False):
     detections = model.predict(image)[0].boxes.data
 
     # detect = model.predict(image)[0].classes.data
-    json = model.predict(image)[0].masks
+    json = model.predict(image)[0].names
 
     print(detections)
     print("-----------")
-    print(json)
+    print("json", json)
     if detections.shape != torch.Size([0, 6]):
         boxes = []
         confidences = []
+        classes_dic = model.predict(image)[0].names
+        classes = []
         for detection in detections:
+            print("detection:", detection)
             confidence = detection[4]
             if float(confidence) < CONFIDENCE_THRESHOLD:
                 continue
             boxes.append(detection[:4])
+            print("boxes", boxes)
             confidences.append(detection[4])
+            classes.append(classes_dic[int(detection[5])])
 
         print(f"{len(boxes)} Number plate(s) have been detected.")
         number_plate_list = []
@@ -131,7 +136,9 @@ def detect_number_plates(image, model, display=False):
                 int(boxes[i][3]),
             )
             # append the bounding box of the number plate
-            number_plate_list.append([[xmin, ymin, xmax, ymax], confidences[i]])
+            number_plate_list.append(
+                [[xmin, ymin, xmax, ymax], confidences[i], classes[i]]
+            )
             print(number_plate_list[i])
             # image = cv2.imread(image)
             # # draw the bounding box and the label on the image
