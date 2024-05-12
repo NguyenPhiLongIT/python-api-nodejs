@@ -8,7 +8,14 @@ import base64
 import cv2 as cv
 import numpy as np
 from ultralytics import YOLO
+from train import detect_number_plates
 
+import time
+
+# Đặt ngưỡng độ tin cậy
+CONFIDENCE_THRESHOLD = 0.5
+# Màu của bounding box và văn bản
+COLOR = (54, 12, 92)
 app = Flask(__name__)
 CORS(app)
 
@@ -71,27 +78,119 @@ def traindata(imgdata):
     model = YOLO(".train/yolov8n.pt")
     model = YOLO(".train/best.pt")
     results = model.predict(img, save=True)  # working
-    cv.waitKey(1)
+    # cv.waitKey(1)
     res_plotted = results[0].plot()
-    cv.imwrite("dsd", res_plotted)
+    time.sleep(10)
+    # cv.imwrite("dsd", res_plotted)
     return res_plotted
 
 
-def decode_base64(filename, code):
-    imgdata = base64.b64decode(code)
-    filename = "./public/uploads/result/" + filename
-    # with open(filename, 'wb') as f:
-    #     result = process_image(imgdata)
-    #     cv.imwrite(filename, result)
-    # with open(filename, "wb") as f:
-    #     result = train(imgdata)
-    #     cv.imwrite(filename, result)
+def predict(mode, base64_img):
+    # Decode base64 string to bytes
+    imgdata = base64.b64decode(base64_img)
 
-    with open(filename, "wb") as f:
-        result = traindata(imgdata)
-        cv.imwrite(filename, result)
+    # Convert bytes to numpy array
+    np_arr = np.frombuffer(imgdata, np.uint8)
+
+    # Decode numpy array to image
+    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
+    combined_img = detect_number_plates(mode, img)
+    return img
+
+
+def predict1(img):
+    yolov8_detector = YOLO(".train/best.pt")
+    # Detect Objects
+    boxes, scores, class_ids = yolov8_detector(img)
+
+    # Draw detections
+    combined_img = yolov8_detector.draw_detections(img)
+    return combined_img
+
+
+def decode_base64(filename, code):
+    # imgdata = base64.b64decode(code)
+    path = "../public/uploads/result/"
+    directory = path + filename
+    dir = directory[1:]
+
+    # Giải mã chuỗi base64 thành dữ liệu nhị phân
+    imgdata = base64.b64decode(code)
+
+    # Chuyển dữ liệu nhị phân thành mảng NumPy
+    np_arr = np.frombuffer(imgdata, np.uint8)
+
+    # Đọc ảnh từ mảng NumPy
+    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
+
+    # Ghi ảnh vào file
+
+    # with open(path, "wb") as f:
+    #     # f.write(imgdata)
+    #     # cv.imwrite(filename, img)
+    #     cv.imwrite(filename, img)
+    #     print("success")
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+    cv.imwrite(directory, img)
+    print("Image saved successfully.")
+    print(dir)
+    print(directory)
+    modelPath = ".train/best.pt"
+    if not os.path.exists(modelPath):
+        os.makedirs(modelPath)
+        print("no path")
+
+    model = YOLO(modelPath)
+
+    print("processing-----------")
+    arr = detect_number_plates(directory, model)
+    print("processing")
+    print(arr)
+    confidences = []
+    boxes = []
+    classes = []
+    number_plate_list = []
+    for detection in arr:
+        confidence = detection[1]
+        if float(confidence) < CONFIDENCE_THRESHOLD:
+            continue
+        boxes.append(detection[0])
+        confidences.append(confidence)
+        classes.append(detection[2])
+        xmin = int(detection[0][0])
+        ymin = int(detection[0][1])
+        xmax = int(detection[0][2])
+        ymax = int(detection[0][3])
+
+        print(xmin, ymin, xmax, ymax, confidence, detection[2])
+        image = cv.imread(directory)
+        # img = np.array(image)
+        cv.rectangle(image, (xmin, ymin), (xmax, ymax), COLOR, 2)
+        text = "{}: {:.2f}%".format(detection[2], confidence * 100)
+        cv.putText(
+            image, text, (xmin, ymin - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2
+        )
+        cv.imwrite(directory, image)
+        print("successful")
+    # image = cv.imread(directory)
+    # cv.putText(image, "dfff", (274, 258 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2)
+    # cv.imwrite(directory, image)
+
+
+# def decode_base64(filename, code):
+
+#     imgdata = base64.b64decode(code)
+#     filename = "./public/uploads/result/" + filename
+#     modelPath = ".train/best.pt"
+# with open(filename, "wb") as f:
+#     result = predict(modelPath, imgdata)
+#     if result is not None:
+#         cv.imwrite(filename, result)
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5005))
     app.run(port=port, debug=True, use_reloader=False)
+    print()
