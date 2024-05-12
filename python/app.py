@@ -15,7 +15,7 @@ import time
 # Đặt ngưỡng độ tin cậy
 CONFIDENCE_THRESHOLD = 0.5
 # Màu của bounding box và văn bản
-COLOR = (0, 255, 0)
+COLOR = (54, 12, 92)
 app = Flask(__name__)
 CORS(app)
 
@@ -141,7 +141,7 @@ def decode_base64(filename, code):
     if not os.path.exists(modelPath):
         os.makedirs(modelPath)
         print("no path")
-    
+
     model = YOLO(modelPath)
 
     print("processing-----------")
@@ -150,41 +150,33 @@ def decode_base64(filename, code):
     print(arr)
     confidences = []
     boxes = []
+    classes = []
     number_plate_list = []
     for detection in arr:
         confidence = detection[1]
         if float(confidence) < CONFIDENCE_THRESHOLD:
             continue
-        boxes.append(detection[:1])
-        confidences.append(detection[1])
+        boxes.append(detection[0])
+        confidences.append(confidence)
+        classes.append(detection[2])
+        xmin = int(detection[0][0])
+        ymin = int(detection[0][1])
+        xmax = int(detection[0][2])
+        ymax = int(detection[0][3])
 
-        # loop over the bounding boxes
-        # for i in range(2):
-        #     # extract the bounding box coordinates
-        #     print(type(boxes[i][0][1]))
-        #     xmin, ymin, xmax, ymax = (
-        #         int(boxes[i][0][0]),
-        #         int(boxes[i][0][1]),
-        #         int(boxes[i][0][2]),
-        #         int(boxes[i][0][3]),
-        #     )
-        #     # append the bounding box of the number plate
-        #     number_plate_list.append([[xmin, ymin, xmax, ymax], confidences[i]])
-        # print(xmin, ymin, xmax, ymax, confidences)
-        # image = cv.imread(directory)
+        print(xmin, ymin, xmax, ymax, confidence, detection[2])
+        image = cv.imread(directory)
         # img = np.array(image)
-        # cv.rectangle(img, (274, 258), (341, 328), COLOR, 3)
-        # text = "Number Plate: {:.2f}%".format(0.9932 * 100)
-        # print("rectangle")
-        # cv.putText(
-        #     directory, text, (274, 258 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2
-        # )
-
+        cv.rectangle(image, (xmin, ymin), (xmax, ymax), COLOR, 2)
+        text = "{}: {:.2f}%".format(detection[2], confidence * 100)
+        cv.putText(
+            image, text, (xmin, ymin - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2
+        )
+        cv.imwrite(directory, image)
         print("successful")
-    image = cv.imread(directory)
-    cv.putText(image, "dfff", (274, 258 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2)
-    cv.imwrite(directory, image)
-    
+    # image = cv.imread(directory)
+    # cv.putText(image, "dfff", (274, 258 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2)
+    # cv.imwrite(directory, image)
 
 
 # def decode_base64(filename, code):
