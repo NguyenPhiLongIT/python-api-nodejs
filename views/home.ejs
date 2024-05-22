@@ -50,13 +50,14 @@
                         <div class="col-md-4">
                             <div class="card-body">
                                 <h5 class="model-number">Model Number: 2</h5>
+                                <h5 class="file-name">Filename: <%= typeof filename != 'undefined' ? filename : '' %></h5> <!-- Hiển thị filename -->
                             </div>
                             <div class="card-body">
                                 <h5 class="history-card card-title">History</h5>
                                 <span class="time">1/1/2024 13:20:00</span>
                                 <span class="model-type">N2 21kg</span>
                                 <span class="status">OK</span>
-                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,8 +71,8 @@
                         <div class="detail col-md-6">
                             <p class="score-center">Score Center: 797</p>
                             <p class="score-marker">Score Marker: 797</p>
-                            <p class="angle">Angle: -78</p>
-                            <p class="adjust">Adjust: -122</p>
+                            <p class="angle">Angle: <%= typeof angle_now != 'undefined' ? angle_now : '' %></p>
+                            <p class="adjust">Adjust: <%= typeof angle_result != 'undefined' ? angle_result : '' %></p>
                         </div>
                     </div>
                     <h5 class="status card-title">Status: OK</h5>

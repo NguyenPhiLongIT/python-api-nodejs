@@ -9,6 +9,7 @@ import cv2 as cv
 import numpy as np
 from ultralytics import YOLO
 from train import detect_number_plates
+import math
 
 import time
 
@@ -38,102 +39,35 @@ def call_python(image_path):
 def postdata():
     data = request.get_json()
     print(data)
+    arr = []
     ls = data["data1"]
+    print("ls", ls)
     filename = ls["filename"]
     code = ls["code"]
-    decode_base64(filename, code)
+    decode_base64(filename, code, arr)
+    # ls["angle_now"] = arr[0]
+    ls["angle_now"] = 666
+    print("angle_now", ls["angle_now"])
+    print("angle-now: ", ls["angle_now"])
+    print("aaeddd", arr)
+    # ls["angle_result"] = arr[1]
+    ls["angle_result"] = 666
+    decode_base64(filename, code, arr)
+    print("postdata")
     return json.dumps({"result": ls})
 
 
-def process_image(imgdata):
-    np_arr = np.frombuffer(
-        imgdata, np.uint8
-    )  # Convert base64-encoded image data to numpy array
-    img = cv.imdecode(np_arr, cv.IMREAD_GRAYSCALE)
-    _, binary_img = cv.threshold(img, 123, 250, cv.THRESH_BINARY_INV)
-
-    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (7, 7))
-    img_dilate = cv.dilate(binary_img, kernel, anchor=(-1, -1), iterations=2)
-    # img_erode = cv.erode(img_dilate, kernel)
-    return img_dilate
-
-
-def train(imgdata):
-    np_arr = np.frombuffer(
-        imgdata, np.uint8
-    )  # Convert base64-encoded image data to numpy array
-    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
-    model = YOLO("yolov8n.pt")
-    results = model(img, save=True)  # working
-    print(results)
-    res_plotted = results[0].plot()
-    return res_plotted
-
-
-def traindata(imgdata):
-    np_arr = np.frombuffer(
-        imgdata, np.uint8
-    )  # Convert base64-encoded image data to numpy array
-    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
-    model = YOLO(".train/yolov8n.pt")
-    model = YOLO(".train/best.pt")
-    results = model.predict(img, save=True)  # working
-    # cv.waitKey(1)
-    res_plotted = results[0].plot()
-    time.sleep(10)
-    # cv.imwrite("dsd", res_plotted)
-    return res_plotted
-
-
-def predict(mode, base64_img):
-    # Decode base64 string to bytes
-    imgdata = base64.b64decode(base64_img)
-
-    # Convert bytes to numpy array
-    np_arr = np.frombuffer(imgdata, np.uint8)
-
-    # Decode numpy array to image
-    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
-    combined_img = detect_number_plates(mode, img)
-    return img
-
-
-def predict1(img):
-    yolov8_detector = YOLO(".train/best.pt")
-    # Detect Objects
-    boxes, scores, class_ids = yolov8_detector(img)
-
-    # Draw detections
-    combined_img = yolov8_detector.draw_detections(img)
-    return combined_img
-
-
-def decode_base64(filename, code):
-    # imgdata = base64.b64decode(code)
-    path = "../public/uploads/result/"
+def decode_base64(filename, code, arr):
+    path = "../public/uploads/"
     directory = path + filename
-    dir = directory[1:]
-
-    # Giải mã chuỗi base64 thành dữ liệu nhị phân
+    result_dir = "../public/uploads/result/" + filename
     imgdata = base64.b64decode(code)
-
-    # Chuyển dữ liệu nhị phân thành mảng NumPy
     np_arr = np.frombuffer(imgdata, np.uint8)
-
-    # Đọc ảnh từ mảng NumPy
-    img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
-
-    # Ghi ảnh vào file
-
-    # with open(path, "wb") as f:
-    #     # f.write(imgdata)
-    #     # cv.imwrite(filename, img)
-    #     cv.imwrite(filename, img)
-    #     print("success")
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-    cv.imwrite(directory, img)
+    imdecode_img = cv.imdecode(np_arr, cv.IMREAD_COLOR)
+    image = imdecode_img.copy()
+    # if not os.path.exists(path):
+    #     os.makedirs(path)
+    # cv.imwrite(directory, img)
     print("Image saved successfully.")
     print(dir)
     print(directory)
@@ -152,6 +86,7 @@ def decode_base64(filename, code):
     boxes = []
     classes = []
     number_plate_list = []
+    centers = []
     for detection in arr:
         confidence = detection[1]
         if float(confidence) < CONFIDENCE_THRESHOLD:
@@ -159,35 +94,42 @@ def decode_base64(filename, code):
         boxes.append(detection[0])
         confidences.append(confidence)
         classes.append(detection[2])
-        xmin = int(detection[0][0])
-        ymin = int(detection[0][1])
-        xmax = int(detection[0][2])
-        ymax = int(detection[0][3])
+        xmin = detection[0][0]
+        ymin = detection[0][1]
+        xmax = detection[0][2]
+        ymax = detection[0][3]
+
+        center1 = math.sqrt(pow(xmax - xmin, 2) + pow(ymax - ymin, 2)) / 2.0
+        center2 = (xmax - xmin) / 2.0
+        centers.append(center1)
+        centers.append(center2)
 
         print(xmin, ymin, xmax, ymax, confidence, detection[2])
-        image = cv.imread(directory)
-        # img = np.array(image)
+        # image = cv.imread(directory)
         cv.rectangle(image, (xmin, ymin), (xmax, ymax), COLOR, 2)
         text = "{}: {:.2f}%".format(detection[2], confidence * 100)
         cv.putText(
             image, text, (xmin, ymin - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2
         )
-        cv.imwrite(directory, image)
+        cv.imwrite(result_dir, image)
+
         print("successful")
-    # image = cv.imread(directory)
-    # cv.putText(image, "dfff", (274, 258 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, COLOR, 2)
-    # cv.imwrite(directory, image)
-
-
-# def decode_base64(filename, code):
-
-#     imgdata = base64.b64decode(code)
-#     filename = "./public/uploads/result/" + filename
-#     modelPath = ".train/best.pt"
-# with open(filename, "wb") as f:
-#     result = predict(modelPath, imgdata)
-#     if result is not None:
-#         cv.imwrite(filename, result)
+    if centers[0] > centers[2]:
+        angle = np.arctan((xmax - xmin) / (ymax - ymin))
+        angle_now = -1 * (angle + 90)
+        angle_return = angle_now + 45
+    elif centers[0] < centers[2]:
+        angle = np.arctan((xmax - xmin) / (ymax - ymin))
+        angle_now = 90 - angle
+        angle_return = 45 - angle_now
+    else:
+        angle_now = -90
+        angle_return = 45
+    result = []
+    result.append(angle_now)
+    result.append(angle_return)
+    arr = result
+    print("arr:", arr)
 
 
 if __name__ == "__main__":

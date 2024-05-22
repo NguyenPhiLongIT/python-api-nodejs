@@ -63,11 +63,14 @@ router.post('/upload', async (req, res) => {
 
     try {
       const base64Image = await convertImageToBase64(req.file.filename);
-
+      const angle_now = 0;
+      const angle_result = 0;
       const data = {
         data1: {
           filename: req.file.filename,
-          code: base64Image
+          code: base64Image,
+          angle_now: angle_now,
+          angle_result: angle_result
         }
       };
 
@@ -91,7 +94,11 @@ router.post('/upload', async (req, res) => {
       res.render('home', {
         msg: 'File Uploaded!',
         file: `uploads/${req.file.filename}`,
-        result: `uploads/result/${req.file.filename}`
+        result: `uploads/result/${req.file.filename}`,
+        filename: req.file.filename,
+        angle_now: 0,
+        angle_result:0
+
       });
     } catch (error) {
       console.error('Error processing file:', error);
