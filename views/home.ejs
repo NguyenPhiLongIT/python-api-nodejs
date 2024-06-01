@@ -9,85 +9,254 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
+<style>
+    body {
+        background-color: #ACD793;
+    }
+
+    .left,
+    .right {
+        height: 90vh;
+    }
+
+    .card {
+        --bs-card-title-spacer-y: 0rem;
+    }
+
+    .ocr,
+    .calculate-offset,
+    .communication,
+    .history {
+        height: 50%;
+    }
+
+    .ocr-title,
+    .calculate-offset-title,
+    .communication-title,
+    .history-title {
+        color: #416D19;
+        background-color: #90D26D;
+        border: 1.5px solid #416D19;
+    }
+
+    .ocr .top,
+    .ocr .subtop {
+        height: 50%;
+        border: 1px solid black;
+    }
+
+    .calculate-offset .wrapper {
+        height: 100%;
+        border: 1px solid black;
+    }
+
+    .history .wrapper, .communication .wrapper{
+        border: 1px solid black;
+        height: 90%;
+    }
+    .communication .plc{
+        margin-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+    }
+    .plc label{
+        height: 1.5rem;
+        width: 5rem;
+        font-size: 11px;
+    }
+    .right-child{
+        border: 1px solid black;
+    }
+    .box{
+        border: 1px solid black;
+        height: 2rem;
+        width: 15rem;
+        background-color: white;
+    }
+    .model-type{
+        display: flex;
+        justify-content: space-around;
+    }
+    .ocr-result{
+        display: flex;
+        gap: 3rem;
+        border: 1px solid black;
+        margin-top: 1rem;
+    }
+    
+    .sample,.result{
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .box-small{
+        border: 1px solid black;
+        height: 2rem;
+        width: 5rem;
+        background-color: white;
+    }
+    .offset-result, .processing-time{
+        margin-top: 0.2rem;
+        border: 1px solid black;
+        display: flex;
+        gap: 2rem;
+    }
+    .offset-result .content{
+        display: flex;
+        gap: 3rem;
+    }
+    .box-large{
+        background-color: green;
+        height: 100%;
+        width: 100%;
+    }
+    .status{
+        margin-top: 0.2rem;
+        border: 1px solid black;
+        /* height: 100%; */
+    }
+</style>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="nav-header navbar navbar-expand-lg">
         <div class="container-fluid" style="width: 80%;">
-            <a class="navbar-brand" href="">Algorit Vision - Object Detection</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Setting</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Status</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Author Info</a>
-                    </li>
-                </ul>
-            </div>
+            <a class="navbar-brand" href="">Automatic Labeling System</a>
         </div>
     </nav>
     <div class="container-fluid">
-        <div class="row g-2">
-            <div class="input-img col-md-8">
-                <div class="card border-primary" style="min-height: 39rem;">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card">
-                                <img src="<%= typeof file != 'undefined' ? file : '' %>" class="responsive-img"
-                                    style="max-height: 38rem;">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card-body">
-                                <h5 class="model-number">Model Number: 2</h5>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="history-card card-title">History</h5>
-                                <span class="time">1/1/2024 13:20:00</span>
-                                <span class="model-type">N2 21kg</span>
-                                <span class="status">OK</span>
-                              </div>
-                        </div>
+        <div class="row g-1">
+            <div class="left col-md-6">
+                <div class="ocr card">
+                    <h5 class="ocr-title card-title">OCR Label</h5>
+                    <div class="top">
+                        <img src="..." class="card-img-top" alt="...">
+                    </div>
+                    <div class="subtop">
+                        <img src="..." class="card-img-top" alt="...">
+                    </div>
+                </div>
+                <div class="calculate-offset card">
+                    <h5 class="calculate-offset-title card-title">Calculate-offset</h5>
+                    <div class="wrapper">
+                        <img src="..." class="card-img-top" alt="...">
                     </div>
                 </div>
             </div>
-            <div class="output-img col-md-4">
-                <div class="card border-success" style="min-height: 39rem;">
-                    <h5 class="model-type card-title">Model Type: N2 21kg</h5>
-                    <h5 class="time card-title">Time Detect: 1/1/2024 13:20:00</h5>
-                    <div class="vision-result row">
-                        <h5 class="card-title col-md-4">Vision Result</h5>
-                        <div class="detail col-md-6">
-                            <p class="score-center">Score Center: 797</p>
-                            <p class="score-marker">Score Marker: 797</p>
-                            <p class="angle">Angle: -78</p>
-                            <p class="adjust">Adjust: -122</p>
+            <div class="right col-md-6">
+                <div class="row g-1" style="height: 100%;">
+                    <div class="left-child col-md-4">
+                        <div class="communication">
+                            <h5 class="communication-title card-title">Communication</h5>
+                            <div class="wrapper">
+                                <h6 class="plc fw-bold">PLC Comm
+                                    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off">
+                                    <label class="btn btn-outline-success" for="btn-check-2-outlined">Connected</label><br>
+                                </h6>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault1">
+                                    <label class="form-check-label fw-bold" for="flexRadioDefault1">
+                                        Use
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault2" checked>
+                                    <label class="form-check-label fw-bold" for="flexRadioDefault2">
+                                        Trig 1
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                        id="flexRadioDefault3" checked>
+                                    <label class="form-check-label fw-bold" for="flexRadioDefault3">
+                                        Trig 2
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="history">
+                            <h5 class="history-title card-title">History</h5>
+                            <div class="wrapper">
+                                
+                            </div>
                         </div>
                     </div>
-                    <h5 class="status card-title">Status: OK</h5>
-                    <h5 class="card-title">Image Detected</h5>
-                    <img src="<%= typeof result != 'undefined' ? result : '' %>" class="responsive-img" 
-                        style="max-height: 20rem;">
+                    <div class="right-child col-md-8">
+                        <div class="model-type">
+                            <h5 class="model-type-title">Model Type</h5>
+                            <div class="model-type box"></div>
+                        </div>
+                        <div class="ocr-result">
+                            <h6 class="ocr-result-title">OCR Result</h6>
+                            <div class="content">
+                                <div class="row-1">Row 1
+                                    <div class="sample">
+                                        <h6 class="sample-1">Sample</h6>
+                                        <div class="sample-1 box"></div>
+                                    </div>
+                                    <div class="result">
+                                        <h6 class="result-1">Result</h6>
+                                        <div class="result-1 box"></div>
+                                    </div>
+                                </div>
+                                <div class="row-2">Row 2
+                                    <div class="sample">
+                                        <h6 class="sample-2">Sample</h6>
+                                        <div class="sample-2 box"></div>
+                                    </div>
+                                    <div class="result">
+                                        <h6 class="result-2">Result</h6>
+                                        <div class="result-2 box"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="offset-result">
+                            <h6 class="ocr-result-title">Offset Result</h6>
+                            <div class="content">
+                                <div class="x-y">
+                                    <div class="x-title">X</div>
+                                    <div class="x-value box-small"></div>
+                                    <div class="y-title">Y</div>
+                                    <div class="y-value box-small"></div>
+                                </div>
+                                <div class="adjust">
+                                    <div class="adjust-title">Adjust</div>
+                                    <div class="adjust-value box-small"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="processing-time">
+                            <h6 class="time-tile">Processing time</h6>
+                            <div class="content">
+                                <div class="ocr-time">OCR
+                                    <div class="ocr-time-value box"></div>
+                                </div>
+                                <div class="offset-time">Calculate Offset
+                                    <div class="offset-time-value box"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="status row gx-0">
+                            <h1 class="status-value col-md-6">OK</h1>
+                            <div class="col-md-6">
+                                <div class="status-color box-large"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-8 col-md-offset-2">
+        <!-- <div class="col-md-8 col-md-offset-2">
             <form method="post" action="/upload" enctype="multipart/form-data">
-            <div class="form-group" style="display: flex; justify-content: space-around;">
-                <input type="file" name="myImage" class="input-group input-file"/>
-                <button type="submit" name="upload" class="btn btn-primary pull-right">Upload</button>
+                <div class="form-group" style="display: flex; justify-content: space-around;">
+                    <input type="file" name="myImage" class="input-group input-file" />
+                    <button type="submit" name="upload" class="btn btn-primary pull-right">Upload</button>
             </form>
-        </div>
+        </div> -->
     </div>
 </body>
+
 </html>
